@@ -99,18 +99,23 @@ public class ConfigDeployer {
                         } catch (ModuleLoadException e) {
                             e.printStackTrace();
                             System.err.println("Unable to deploy '" + id + "': " + e.getMessage());
+                            e.printStackTrace();
                         } catch (ClassNotFoundException e) {
                             e.printStackTrace();
                             System.err.println("Unable to deploy '" + id + "': " + e.getMessage());
+                            e.printStackTrace();
                         } catch (InstantiationException e) {
                             e.printStackTrace();
                             System.err.println("Unable to deploy '" + id + "': " + e.getMessage());
+                            e.printStackTrace();
                         } catch (IllegalAccessException e) {
                             e.printStackTrace();
                             System.err.println("Unable to deploy '" + id + "': " + e.getMessage());
+                            e.printStackTrace();
                         } catch (InitializationException e) {
                             e.printStackTrace();
                             System.err.println("Unable to deploy '" + id + "': " + e.getMessage());
+                            e.printStackTrace();
                         }
                     } else {
                         System.err.println("unknown resource deployment type: " + type);

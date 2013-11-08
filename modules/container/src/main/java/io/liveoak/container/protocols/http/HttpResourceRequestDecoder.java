@@ -71,8 +71,6 @@ public class HttpResourceRequestDecoder extends MessageToMessageDecoder<FullHttp
         }
         MediaTypeMatcher mediaTypeMatcher = new MediaTypeMatcher(acceptHeader, extension);
 
-        String authToken = getAuthorizationToken(msg);
-
         ResourceParams params = DefaultResourceParams.instance(decoder.parameters());
 
         if (msg.getMethod().equals(HttpMethod.POST)) {
@@ -81,14 +79,14 @@ public class HttpResourceRequestDecoder extends MessageToMessageDecoder<FullHttp
             out.add(new ResourceRequest.Builder(RequestType.CREATE, new ResourcePath(decoder.path()))
                     .resourceParams(params)
                     .mediaTypeMatcher(mediaTypeMatcher)
-                    .requestAttribute(AuthConstants.ATTR_AUTHORIZATION_TOKEN, authToken)
+                    .requestAttribute(HttpHeaders.Names.AUTHORIZATION, msg.headers().get(HttpHeaders.Names.AUTHORIZATION))
                     .resourceState(decodeState(contentType, msg.content()))
                     .build());
         } else if (msg.getMethod().equals(HttpMethod.GET)) {
             out.add(new ResourceRequest.Builder(RequestType.READ, new ResourcePath(decoder.path()))
                     .resourceParams(params)
                     .mediaTypeMatcher(mediaTypeMatcher)
-                    .requestAttribute(AuthConstants.ATTR_AUTHORIZATION_TOKEN, authToken)
+                    .requestAttribute(HttpHeaders.Names.AUTHORIZATION, msg.headers().get(HttpHeaders.Names.AUTHORIZATION))
                     .pagination(decodePagination(params))
                     .returnFields(decodeReturnFields(params))
                     .build());
@@ -98,14 +96,14 @@ public class HttpResourceRequestDecoder extends MessageToMessageDecoder<FullHttp
             out.add(new ResourceRequest.Builder(RequestType.UPDATE, new ResourcePath(decoder.path()))
                     .resourceParams(params)
                     .mediaTypeMatcher(mediaTypeMatcher)
-                    .requestAttribute(AuthConstants.ATTR_AUTHORIZATION_TOKEN, authToken)
+                    .requestAttribute(HttpHeaders.Names.AUTHORIZATION, msg.headers().get(HttpHeaders.Names.AUTHORIZATION))
                     .resourceState(decodeState(contentType, msg.content()))
                     .build());
         } else if (msg.getMethod().equals(HttpMethod.DELETE)) {
             out.add(new ResourceRequest.Builder(RequestType.DELETE, new ResourcePath(decoder.path()))
                     .resourceParams(params)
                     .mediaTypeMatcher(mediaTypeMatcher)
-                    .requestAttribute(AuthConstants.ATTR_AUTHORIZATION_TOKEN, authToken)
+                    .requestAttribute(HttpHeaders.Names.AUTHORIZATION, msg.headers().get(HttpHeaders.Names.AUTHORIZATION))
                     .build());
         }
 
@@ -146,18 +144,6 @@ public class HttpResourceRequestDecoder extends MessageToMessageDecoder<FullHttp
                 return limit;
             }
         };
-    }
-
-    protected String getAuthorizationToken(FullHttpRequest req) {
-        String[] authorization = req.headers().contains(HttpHeaders.Names.AUTHORIZATION) ? req.headers().get(HttpHeaders.Names.AUTHORIZATION).split(" ") : null;
-        if (authorization == null) {
-            return null;
-        } else if (authorization.length != 2 || !authorization[0].equalsIgnoreCase("Bearer")) {
-            System.err.println("Authorization header is invalid or it's of different type than 'Bearer'. Ignoring");
-            return null;
-        } else {
-            return authorization[1];
-        }
     }
 
     private static int limit(int value, int lower, int upper) {
